@@ -3,13 +3,8 @@ import TripleSelector from "./TripleSelector";
 import Grid from "@material-ui/core/Grid";
 import Chart from "./Chart";
 import MyAppBar from "./MyAppBar";
+import { getCategorys, getProducts } from "../modules/sales_api";
 
-const _categorys = ["Category1", "Category2", "Category3"];
-const _products = {
-  Category1: ["Product1", "Product2", "Product3"],
-  Category2: ["Product4", "Product5", "Product6"],
-  Category3: ["Product7", "Product8", "Product9"],
-};
 const _brands = {
   Product1: ["Brand1", "Brand2", "Brand3"],
   Product2: ["Brand4", "Brand5", "Brand6"],
@@ -30,14 +25,6 @@ const _data = {
   Brand5: [300, 200, 500, 300],
 };
 
-const getCategorys = () => {
-  return _categorys;
-};
-
-const getProducts = (category) => {
-  return _products[category];
-};
-
 const getBrands = (product) => {
   return _brands[product];
 };
@@ -56,8 +43,19 @@ export default function Page() {
   const [brand_list, setBrandList] = React.useState([]);
   const [data, setData] = React.useState([]);
 
-  const set_products = (category) => {
-    var products = getProducts(category);
+  const set_products = async (category) => {
+    try {
+      var products = await getProducts(category);
+      console.log("product: ", products);
+      if (!Array.isArray(products)) {
+        throw new Error();
+      }
+      setProductList(products);
+    } catch (error) {
+      console.log(error);
+      setError("Could not get products from server, please try again later");
+    }
+    var products = await getProducts(category);
     setProductList(products);
   };
 
@@ -73,8 +71,11 @@ export default function Page() {
 
   React.useEffect(() => {
     try {
-      var categorys = getCategorys();
-      setCategoryList(categorys);
+      const sync_getCategorys = async () => {
+        var categorys = await getCategorys();
+        setCategoryList(categorys);
+      };
+      sync_getCategorys();
     } catch (error) {
       console.log(error);
       setError("Could not get categorys from server, please try again later");
@@ -94,9 +95,9 @@ export default function Page() {
         <TripleSelector
           title1="Categoria"
           store1={category}
-          onChange1={(cat) => {
+          onChange1={async (cat) => {
             setCategory(cat.target.value);
-            set_products(cat.target.value);
+            await set_products(cat.target.value);
             setBrandList([]);
             setData([]);
           }}
