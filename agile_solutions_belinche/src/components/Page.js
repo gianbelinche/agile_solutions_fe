@@ -3,19 +3,7 @@ import TripleSelector from "./TripleSelector";
 import Grid from "@material-ui/core/Grid";
 import Chart from "./Chart";
 import MyAppBar from "./MyAppBar";
-import { getCategorys, getProducts } from "../modules/sales_api";
-
-const _brands = {
-  Product1: ["Brand1", "Brand2", "Brand3"],
-  Product2: ["Brand4", "Brand5", "Brand6"],
-  Product3: ["brand7", "brand8", "brand9"],
-  Product4: ["brand10", "brand11", "brand12"],
-  Product5: ["brand13", "brand14", "brand15"],
-  Product6: ["brand16", "brand17", "brand18"],
-  Product7: ["brand19", "brand20", "brand21"],
-  Product8: ["brand22", "brand23", "brand24"],
-  Product9: ["brand25", "brand26", "brand27"],
-};
+import { getCategorys, getProducts, getBrands } from "../modules/sales_api";
 
 const _data = {
   Brand1: [100, 500, 300, 100],
@@ -23,10 +11,6 @@ const _data = {
   Brand3: [400, 200, 600, 300],
   Brand4: [600, 100, 200, 200],
   Brand5: [300, 200, 500, 300],
-};
-
-const getBrands = (product) => {
-  return _brands[product];
 };
 
 const getData = (brand) => {
@@ -46,22 +30,21 @@ export default function Page() {
   const set_products = async (category) => {
     try {
       var products = await getProducts(category);
-      console.log("product: ", products);
-      if (!Array.isArray(products)) {
-        throw new Error();
-      }
       setProductList(products);
     } catch (error) {
       console.log(error);
       setError("Could not get products from server, please try again later");
     }
-    var products = await getProducts(category);
-    setProductList(products);
   };
 
-  const set_brands = (product) => {
-    var brands = getBrands(product);
-    setBrandList(brands);
+  const set_brands = async (product) => {
+    try {
+      var brands = await getBrands(product);
+      setBrandList(brands);
+    } catch (error) {
+      console.log(error);
+      setError("Could not get brands from server, please try again later");
+    }
   };
 
   const set_data = (brand) => {
@@ -104,9 +87,9 @@ export default function Page() {
           elements1={category_list}
           title2="Productos"
           store2={product}
-          onChange2={(prod) => {
+          onChange2={async (prod) => {
             setProduct(prod.target.value);
-            set_brands(prod.target.value);
+            await set_brands(prod.target.value);
             setData([]);
           }}
           elements2={product_list}
