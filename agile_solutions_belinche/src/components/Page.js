@@ -3,19 +3,12 @@ import TripleSelector from "./TripleSelector";
 import Grid from "@material-ui/core/Grid";
 import Chart from "./Chart";
 import MyAppBar from "./MyAppBar";
-import { getCategorys, getProducts, getBrands } from "../modules/sales_api";
-
-const _data = {
-  Brand1: [100, 500, 300, 100],
-  Brand2: [600, 200, 100, 300],
-  Brand3: [400, 200, 600, 300],
-  Brand4: [600, 100, 200, 200],
-  Brand5: [300, 200, 500, 300],
-};
-
-const getData = (brand) => {
-  return _data[brand];
-};
+import {
+  getCategorys,
+  getProducts,
+  getBrands,
+  getData,
+} from "../modules/sales_api";
 
 export default function Page() {
   const [error, setError] = React.useState("");
@@ -47,9 +40,14 @@ export default function Page() {
     }
   };
 
-  const set_data = (brand) => {
-    var data = getData(brand);
-    setData(data);
+  const set_data = async (brand) => {
+    try {
+      var data = await getData(brand);
+      setData(data);
+    } catch (error) {
+      console.log(error);
+      setError("Could not get data from server, please try again later");
+    }
   };
 
   React.useEffect(() => {
@@ -95,9 +93,9 @@ export default function Page() {
           elements2={product_list}
           title3="Marcas"
           store3={brand}
-          onChange3={(brn) => {
+          onChange3={async (brn) => {
             setBrand(brn.target.value);
-            set_data(brn.target.value);
+            await set_data(brn.target.value);
           }}
           elements3={brand_list}
         />
