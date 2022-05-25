@@ -58,5 +58,5 @@ export default function Chart(props) {
     ],
   };
 
-  return <Bar options={options} data={data} style={props.style} />;
+  return <Bar options={options} data={data} />;
 }

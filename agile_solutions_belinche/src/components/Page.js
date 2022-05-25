@@ -68,7 +68,6 @@ export default function Page() {
       style={{
         minWidth: "100%",
         height: "100vh",
-        resizeMode: "contained",
       }}
     >
       <div style={{ minWidth: "100%", height: "100vh" }}>
